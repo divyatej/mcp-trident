@@ -51,7 +51,7 @@ class MCPProxy:
         )
 
         # Forward stderr from server → our stderr transparently
-        asyncio.create_task(self._pipe_stderr())
+        stderr_task = asyncio.create_task(self._pipe_stderr())
 
         # Bidirectional pump
         client_to_server = asyncio.create_task(
@@ -75,8 +75,28 @@ class MCPProxy:
             [client_to_server, server_to_client],
             return_when=asyncio.FIRST_COMPLETED,
         )
-        for task in pending:
+        for task in [*pending, stderr_task]:
             task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+        # Close subprocess cleanly — prevents ResourceWarning on Windows when
+        # the event loop closes before pipe transports are garbage-collected.
+        if self._proc.stdin:
+            self._proc.stdin.close()
+            try:
+                await self._proc.stdin.wait_closed()
+            except Exception:
+                pass
+        if self._proc.returncode is None:
+            self._proc.terminate()
+            try:
+                await asyncio.wait_for(self._proc.wait(), timeout=2.0)
+            except TimeoutError:
+                self._proc.kill()
+                await self._proc.wait()
 
         self.logger.flush()
         return self._proc.returncode or 0

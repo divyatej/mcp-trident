@@ -124,6 +124,14 @@ rules:
     action: block
     reason: 'sudo detected in tool argument'
 
+  # ── Path traversal ──────────────────────────────────────────────────
+  - name: block-path-traversal
+    match:
+      tool: '*'
+      args_any_value: '.*\.\./.*'
+    action: block
+    reason: 'Path traversal sequence detected'
+
   # ── Cost / loop abuse ────────────────────────────────────────────────
   - name: alert-high-frequency
     match:

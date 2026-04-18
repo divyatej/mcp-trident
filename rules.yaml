@@ -13,14 +13,6 @@ rules:
     action: block
     reason: "Attempt to read a sensitive credential or system file"
 
-  - name: block-aws-credentials
-    match:
-      tool: "*"
-      args:
-        path: ".*\\.aws.*"
-    action: block
-    reason: "Attempt to access AWS credentials directory"
-
   # ── Shell / command injection ────────────────────────────────────────────
   - name: block-shell-injection
     match:

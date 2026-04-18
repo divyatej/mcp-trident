@@ -71,6 +71,34 @@ class TestDefaultRules:
         v = engine.evaluate("bash", {"command": "sudo cat /etc/shadow"})
         assert v.action == "block"
 
+    def test_block_path_traversal(self, engine):
+        v = engine.evaluate("read_file", {"path": "../../etc/passwd"})
+        assert v.action == "block"
+
+    def test_allow_relative_path_without_traversal(self, engine):
+        v = engine.evaluate("read_file", {"path": "./config/settings.json"})
+        assert v.action == "allow"
+
+    def test_alert_env_var_leak(self, engine):
+        v = engine.evaluate("bash", {"command": "echo $OPENAI_API_KEY"})
+        assert v.action == "alert"
+
+    def test_allow_env_var_without_secret_prefix(self, engine):
+        v = engine.evaluate("bash", {"command": "echo $HOME"})
+        assert v.action == "allow"
+
+    def test_alert_high_frequency(self, engine):
+        for _ in range(51):
+            v = engine.evaluate("read_file", {"path": "/tmp/x.txt"})
+        assert v.action == "alert"
+        assert v.rule_name == "alert-high-frequency"
+
+    def test_allow_low_frequency(self):
+        engine = RuleEngine()
+        for _ in range(5):
+            v = engine.evaluate("read_file", {"path": "/tmp/x.txt"})
+        assert v.action == "allow"
+
     def test_allow_legitimate_write(self, engine):
         v = engine.evaluate("write_file", {"path": "/tmp/output.txt", "content": "hello world"})
         assert v.action == "allow"

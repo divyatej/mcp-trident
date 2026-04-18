@@ -17,7 +17,6 @@ class AuditLogger:
     def __init__(self, log_path: str = "mcp_watchdog.jsonl"):
         self._path = Path(log_path)
         self._buffer: list[dict] = []
-        self._start_time = time.time()
 
     # ------------------------------------------------------------------
 

@@ -27,12 +27,10 @@ def generate_report(log_path: str, out_path: str = "mcp_watchdog_report.html"):
     tool_calls: Counter = Counter()
     verdicts: list[dict] = []
     sessions: set = set()
-    methods: Counter = Counter()
 
     for e in events:
         sessions.add(e.get("session", ""))
         if e["type"] == "message":
-            methods[e.get("method", "")] += 1
             if e.get("tool"):
                 tool_calls[e["tool"]] += 1
         elif e["type"] == "verdict":
@@ -53,11 +51,9 @@ def generate_report(log_path: str, out_path: str = "mcp_watchdog_report.html"):
     html = _build_html(
         sessions=sessions,
         tool_calls=tool_calls,
-        methods=methods,
         blocks=blocks,
         alerts=alerts,
         timeline=timeline,
-        events=events,
         log_path=log_path,
     )
 
@@ -65,7 +61,7 @@ def generate_report(log_path: str, out_path: str = "mcp_watchdog_report.html"):
     print(f"Report written to {out_path}")
 
 
-def _build_html(sessions, tool_calls, methods, blocks, alerts, timeline, events, log_path):
+def _build_html(sessions, tool_calls, blocks, alerts, timeline, log_path):
     total_calls = sum(tool_calls.values())
 
     top_tools_rows = "\n".join(

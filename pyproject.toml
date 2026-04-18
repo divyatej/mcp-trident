@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Runtime security proxy for MCP tool calls — intercept, audit, and block suspicious agent behaviour"
 readme = "README.md"
 license = { text = "MIT" }
-authors = [{ name = "mcp-watchdog contributors" }]
+authors = [{ name = "Divyatej Akella" }]
 keywords = ["mcp", "security", "llm", "ai-agents", "prompt-injection", "audit"]
 classifiers = [
     "Development Status :: 3 - Alpha",

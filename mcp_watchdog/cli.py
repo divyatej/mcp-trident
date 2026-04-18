@@ -53,12 +53,16 @@ Examples:
     rul = subparsers.add_parser("rules", help="Print loaded rules and exit")
     rul.add_argument("--rules", metavar="FILE")
 
-    # Intercept '--' separator so remainder becomes server_cmd
-    args, remainder = parser.parse_known_args()
+    # Split on '--' before argparse sees it so it isn't mistaken for a subcommand
+    argv = sys.argv[1:]
+    if "--" in argv:
+        split = argv.index("--")
+        remainder = argv[split + 1 :]
+        argv = argv[:split]
+    else:
+        remainder = []
 
-    # Strip leading '--' if present
-    if remainder and remainder[0] == "--":
-        remainder = remainder[1:]
+    args = parser.parse_args(argv)
 
     # ----------------------------------------------------------------
     if args.subcommand == "report":

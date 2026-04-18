@@ -7,4 +7,5 @@ build/
 *.jsonl
 *.html
 .DS_Store
+fake_server.py
 posts/
