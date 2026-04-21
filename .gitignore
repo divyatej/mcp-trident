@@ -8,4 +8,5 @@ build/
 *.html
 .DS_Store
 fake_server.py
+.vscode/
 posts/
